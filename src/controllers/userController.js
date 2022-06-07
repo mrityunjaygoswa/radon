@@ -6,7 +6,7 @@ const createUser= async function (req, res) {
     res.send({msg: savedData})
 }
 
-const getUsersData= async function (req, res) {
+const getUsersData= async function (_req, res) {
     let allUsers= await UserModel.find()
     res.send({msg: allUsers})
 }

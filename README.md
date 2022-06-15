@@ -13,7 +13,7 @@
     "firstName" : "Sabiha",
     "lastName" : "Khan",
     "mobile" : "9898909087",
-    "emailId" : "sk@gmail.com",
+   "emailId": "sk@gmail.com",
     "password" : "password123",
     "gender" : "female",
 	"isDeleted": false, //default value is false 

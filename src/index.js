@@ -18,3 +18,20 @@ app.use('/', route);
 app.listen(process.env.PORT || 3000, function () {
     console.log('Express app running on port ' + (process.env.PORT || 3000))
 });
+
+
+
+for (i=0;i<Array.length;i++)
+{ let count=0;
+for(j=2;j<10;j++){
+
+do{
+    count++
+}
+while(Array[i]%j===0)
+}
+if(count>1){ break}
+else {
+    console.log(a[i])
+}
+}

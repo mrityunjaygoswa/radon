@@ -1,0 +1,29 @@
+{
+  "name": "nodeprojects",
+  "version": "1.0.0",
+  "description": "- Create a group database `groupXDatabase`. You can clean the db you previously used and resue that.\r - This time each group should have a *single git branch*. Coordinate amongst yourselves by ensuring every next person pulls the code last pushed by a team mate. You branch will be checked as part of the demo. Branch name should follow the naming convention `project/internshipGroupX`\r - Follow the naming conventions exactly as instructed. The backend code will be integrated with the front-end application which means any mismatch in the expected request body will lead to failure in successful integration.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MrMohit08/nodeProjects.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MrMohit08/nodeProjects/issues"
+  },
+  "homepage": "https://github.com/MrMohit08/nodeProjects#readme",
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "cors": "^2.8.5",
+    "email-validator": "^2.0.4",
+    "express": "^4.18.1",
+    "lodash": "^4.17.21",
+    "mongoose": "^6.4.1",
+    "nodemon": "^1.3.3"
+  }
+}

@@ -5,7 +5,7 @@ const booksController = require('../controllers/booksController')
 const router = express.Router();
 
 router.post('/register',userController.createUser)
-// router.post('/login',userController.loginUser)
+router.post('/login',userController.loginUser)
 // router.post('/books',booksController.createBooks)
 // router.get('/books',booksController.getBooks)
 // router.get('/books/:bookId',booksController.getBooksById)

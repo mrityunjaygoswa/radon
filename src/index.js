@@ -13,7 +13,7 @@ app.use('/',route)
 
 const string = "mongodb+srv://WASIF321:Ansari738871@wasifdatabase.wdcjr.mongodb.net/group42Database"
 
-mongoose.connect(string)
+mongoose.connect(string, {useNewUrlParser: true})
 .then(()=>console.log("mongoDB is connected"))
 .catch((err)=>console.log(err));
 

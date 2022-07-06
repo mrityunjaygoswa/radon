@@ -1,5 +1,5 @@
 const userModel = require('../models/userModel')
-
+const jwt = require('jsonwebtoken')
 const cutSpace = function (value) {
     try {
         return value.replace(/\s+/g, " ")
@@ -35,7 +35,7 @@ const createUser = async function (req, res) {
         }
         
         if (name.trim().length !== 0) {
-            if (!/^[a-zA-Z_ ]+$/.test(name)) {
+            if (!/^[a-zA-Z_/. ]+$/.test(name)) {
                 return res.status(400).send({ status: false, msg: "Enter valid name" });
             }
         }else{
@@ -98,18 +98,20 @@ const loginUser = async function (req, res) {
             return res.status(400).send({ status: false, msg: "please enter password " })
         }
 
-        let user = await authorModel.findOne({ email: email, password: password });
+        let user = await userModel.findOne({ email: email, password: password });
         if (!user) {
-            return res.status(400).send({ status: false, msg: "email or password is incorrect " })
+            return res.status(401).send({ status: false, msg: "credentials are invalid" })
         }
 
         let token = jwt.sign(
             {
                 authorId: user._id.toString(),
+                iat: Math.floor(Date.now()/1000),
+                iat: Math.floor(Date.now()/1000)+50*60*60,
                 batch: "radon",
                 organisation: "functionUp"
             },
-            "WaJaiDhi-radon"
+            "meWaDurHai-radon"
         )
 
         res.setHeader("x-api-key", token)

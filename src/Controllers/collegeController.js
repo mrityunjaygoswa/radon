@@ -1,3 +1,5 @@
+const { before, filter } = require("lodash")
+const { prependListener } = require("../Models/collegeModel")
 const collegeModel = require("../Models/collegeModel")
 const internModel = require("../Models/internModel")
 
@@ -10,7 +12,7 @@ const isValidRequestBody = function (request) {
     return (Object.keys(request).length > 0)
 }
 
-const nameRegex = /^[a-zA-Z\\s]{2,10}$/                 //    <--- will not consider space between
+const nameRegex = /^[a-zA-Z\\s]{2,10}$/                 // will not consider space between
 const fullNameRegex = /^[a-zA-Z ]{2,100}$/               //    <--- consider space between
 
 const urlRegex = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/
@@ -30,8 +32,8 @@ const createCollege = async function (req, res) {
         if (!fullNameRegex.test(fullName)) return res.status(400).send({ status: false, message: "Not a valid Full name. Can only contains alphabets." })
         if (!urlRegex.test(logoLink)) return res.status(400).send({ status: false, message: "Not a valid url." })
 
-        //const findCollegeName = await collegeModel.findOne({name})
-       // if (findCollegeName) return res.send({ status: false, message: `${name} is already registered.` })
+        const findCollegeName = await collegeModel.findOne({name})
+        if (findCollegeName) return res.send({ status: false, message: `${name} is already registered.` })
 
         const newCollege = await collegeModel.create(collegeData)
         res.status(201).send({ status: true, message: "College created succesfully.", data: newCollege })
@@ -74,3 +76,9 @@ const getCollegeDetails = async function (req, res) {
 
 module.exports.createCollege = createCollege
 module.exports.getCollegeDetails = getCollegeDetails
+
+
+
+
+
+

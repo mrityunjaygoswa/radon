@@ -1,22 +1,23 @@
 const userModel = require('../models/userModel')
 const jwt = require('jsonwebtoken')
-const cutSpace = function (value) {
-    try {
-        return value.replace(/\s+/g, " ")
-    } catch (err) {
-        return res.status(500).send({ status: false, msg: err.message })
-    }
-}
+
+// const cutSpace = async function (value) {
+//     try {
+//         return value.replace(/\s+/g, " ")
+//     } catch (err) {
+//         return res.status(500).send({ status: false, msg: err.message })
+//     }
+// }
 
 const createUser = async function (req, res) {
     try {
 
         let { title, name,  phone, email, password,} = req.body
 
-        let titleName = cutSpace(title)
-        req.body.title = titleName
-        let Name = cutSpace(name)
-        req.body.name = Name
+        // let titleName = cutSpace(title)
+        // req.body.title = titleName
+        // let Name = cutSpace(name)
+        // req.body.name = Name
 
         if (Object.keys(req.body).length == 0) {
             return res.status(400).send({ status: false, msg: "Please enter data in the request body" })
@@ -35,7 +36,7 @@ const createUser = async function (req, res) {
         }
         
         if (name.trim().length !== 0) {
-            if (!/^[a-zA-Z_/. ]+$/.test(name)) {
+            if (!/^[a-zA-Z_ ]+$/.test(name)) {
                 return res.status(400).send({ status: false, msg: "Enter valid name" });
             }
         }else{
@@ -100,14 +101,14 @@ const loginUser = async function (req, res) {
 
         let user = await userModel.findOne({ email: email, password: password });
         if (!user) {
-            return res.status(401).send({ status: false, msg: "credentials are invalid" })
+            return res.status(401).send({ status: false, msg: " your credentials are invalid" })
         }
 
         let token = jwt.sign(
             {
                 authorId: user._id.toString(),
                 iat: Math.floor(Date.now()/1000),
-                iat: Math.floor(Date.now()/1000)+50*60*60,
+                exp: Math.floor(Date.now()/1000)+50*60*60,
                 batch: "radon",
                 organisation: "functionUp"
             },
@@ -123,6 +124,7 @@ const loginUser = async function (req, res) {
 }
 
 module.exports = {
+    // cutSpace,
     createUser,
     loginUser
 }

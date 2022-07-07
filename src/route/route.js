@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/register',userController.createUser)
 router.post('/login',userController.loginUser)
 router.post('/books',booksController.createBooks)
-// router.get('/books',booksController.getBooks)
+router.get('/books',booksController.getBooks)
 // router.get('/books/:bookId',booksController.getBooksById)
 // router.put('/books/:bookId',booksController.updateBooksById)
 // router.delete('/books/:bookId',booksController.deleteBooksById)

@@ -1,13 +1,14 @@
 const userModel = require('../models/userModel')
 const jwt = require('jsonwebtoken')
+const express = require('express')
 
-// const cutSpace = async function (value) {
-//     try {
-//         return value.replace(/\s+/g, " ")
-//     } catch (err) {
-//         return res.status(500).send({ status: false, msg: err.message })
-//     }
-// }
+const cutSpace = function (value) {
+    try {
+        return value.replace(/\s+/g, " ")
+    } catch (err) {
+        return res.status(500).send({ status: false, msg: err.message })
+    }
+}
 
 const createUser = async function (req, res) {
     try {
@@ -16,24 +17,23 @@ const createUser = async function (req, res) {
 
         // let titleName = cutSpace(title)
         // req.body.title = titleName
-        // let Name = cutSpace(name)
-        // req.body.name = Name
+       
 
         if (Object.keys(req.body).length == 0) {
             return res.status(400).send({ status: false, msg: "Please enter data in the request body" })
         }
-
         
         if (!title) {
             return res.status(400).send({ status: false, msg: "title is missing" })
         }
-        if (!(title == "Mrs" || title == "Mr" || title == "Miss")) {
-            return res.status(401).send({ error: "title has to be Mr or Mrs or Miss " })
-        }
         
-        if (!name) {
-            return res.status(400).send({ status: false, msg: "name is missing" })
-        }
+            if (["Mr","Mrs","Miss"].indexOf(title)==-1) {
+                return res.status(400).send({ error: "title has to be Mr or Mrs or Miss " })
+            }
+            
+            if (!name) {
+                return res.status(400).send({ status: false, msg: "name is missing" })
+            }
         
         if (name.trim().length !== 0) {
             if (!/^[a-zA-Z_ ]+$/.test(name)) {
@@ -70,10 +70,12 @@ const createUser = async function (req, res) {
         if (!password) {
             return res.status(400).send({ status: false, msg: "password is missing" })
         }
-        if (!/^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[a-zA-Z!#$%&? "])[a-zA-Z0-9!#$%&?]{8,20}$/.test(password)) {
+        if (!/^(?=.*\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[a-zA-Z!#$%&@? "])[a-zA-Z0-9!#$%&@?]{8,20}$/.test(password)) {
             return res.status(400).send({ status: false, msg: "Enter a valid password" });
         }
 
+        let Name = cutSpace(name)
+        req.body.name = Name
 
         let savedData = await userModel.create(req.body)
         return res.status(201).send({ status: true, msg: " you are registered successfully", data: savedData })
@@ -124,7 +126,7 @@ const loginUser = async function (req, res) {
 }
 
 module.exports = {
-    // cutSpace,
+    cutSpace,
     createUser,
     loginUser
 }

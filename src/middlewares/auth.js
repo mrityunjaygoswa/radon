@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken')
+const booksModel = require('../models/booksModel')
+const mongoose = require('mongoose')
 
 //---------------------------------------------------------authentication-----------------------------------------------------------------------//
 
@@ -6,11 +8,11 @@ const authentication = async function (req, res, next) {
     try {
         let token = req.headers["x-api-key" || "X-Api-Key"]
         if (!token) {
-            return res.status(400).send({ status: false, msg: "please send the token" })
+            return res.status(400).send({ status: false, message: "please send the token" })
         }
 
-        let decodedToken = jwt.verify(token, "meWaDurHai-radon", function (error,token) {
-            if (error) {
+        let decodedToken = jwt.verify(token, "meWaDurHai-radon", function (err, token) {
+            if (err) {
                 return undefined
             } else {
                 return token
@@ -18,20 +20,118 @@ const authentication = async function (req, res, next) {
         })
 
         if (decodedToken == undefined) {
-            return res.status(401).send({ status: false, msg: "invalid token" })
+            return res.status(401).send({ status: false, message: "invalid token" })
         }
 
         req["decodedToken"] = decodedToken
+
         next()
 
     } catch (err) {
-        return res.status(500).send({ status: false, msg: err.message })
+        return res.status(500).send({ status: false, message: err.message })
     }
 }
 
-//---------------------------------------------------------authorization-----------------------------------------------------------------------//
+//---------------------------------------------------------authorization1-----------------------------------------------------------------------//
 
+const authorization1 = async function (req, res, next) {
+    try {
+        let validUserId = req.decodedToken.userId
+        let userId = req.body.userId
+
+        if (!userId) {
+            return res.status(400).send({ status: false, message: "Please enter userId" })
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).send({ status: false, message: "Please enter valid userId" })
+        }
+
+        if (userId != validUserId) {
+            return res.status(403).send({ status: false, message: "Author is not authorized" })
+        }
+
+        next()
+
+    } catch (err) {
+        return res.status(500).send({ status: false, message: err.message })
+    }
+}
+
+//---------------------------------------------------------authorization2-----------------------------------------------------------------------//
+
+const authorization2 = async function (req, res, next) {
+
+    try {
+        let validUserId = req.decodedToken.userId
+        let { userId, category, subcategory } = req.query
+
+        if (Object.keys(req.query).length == 0) {
+            return res.status(400).send({ status: false, msg: "please enter a query" })
+        }
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).send({ status: false, message: "Please enter valid userId" })
+        }
+
+        let savedData = await booksModel.find({ $or: [{ userId: userId }, { category: category }, { subcategory: subcategory }] })
+
+        if (!savedData[0]) {
+            return res.status(400).send({ status: false, msg: "no book exists with the given query" })
+        }
+        
+        let arr = []
+        for (let i = 0; i < savedData.length; i++) {
+            if (savedData[i].userId == validUserId) {
+                arr.push(savedData[i].userId)
+            }
+        }
+
+        if (arr[0] != validUserId) {
+            return res.status(403).send({ status: false, msg: "you are not authorized" })
+        } else {
+            next()
+        }
+    } catch (err) {
+        return res.status(500).send({ status: false, message: err.message })
+    }
+
+}
+
+//---------------------------------------------------------authorization3-----------------------------------------------------------------------//
+
+const authorization3 = async function (req, res, next) {
+    try {
+        let validUserId = req.decodedToken.userId
+        let bookId = req.params.bookId
+
+        if (!mongoose.Types.ObjectId.isValid(bookId)) {
+            return res.status(400).send({ status: false, message: "Please enter valid bookId" })
+        }
+
+        let checkBooks = await booksModel.findById(bookId)
+
+        if (!checkBooks) {
+            return res.status(404).send({ status: false, message: "no such book exists" })
+        }
+        if (checkBooks.userId != validUserId) {
+            return res.status(403).send({ status: false, message: "Author is not authorized" })
+        }
+
+        if (checkBooks.isDeleted == true) {
+            return res.status(404).send({ status: false, message: "this document is  already deleted" })
+        }
+
+        next()
+
+    } catch (err) {
+        return res.status(500).send({ status: false, message: err.message })
+    }
+}
 
 module.exports = {
-    authentication
+    authentication,
+    authorization1,
+    authorization2,
+    authorization3,
 }

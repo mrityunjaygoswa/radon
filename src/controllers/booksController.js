@@ -1,8 +1,8 @@
 const userController = require('../controllers/userController');
 const booksModel = require('../models/booksModel');
-const reviewModel = require('../models/reviewModel')
-const mongoose = require('mongoose')
-const moment = require('moment')
+const reviewModel = require('../models/reviewModel');
+const mongoose = require('mongoose');
+const moment = require('moment');
 
 let { cutSpace } = userController
 
@@ -11,7 +11,7 @@ let { cutSpace } = userController
 const createBooks = async function (req, res) {
 
     try {
-        let { title, excerpt, userId, ISBN, category, subcategory, releasedAt } = req.body;
+        let { title, excerpt, ISBN, category, subcategory, releasedAt } = req.body;
 
 
         if (Object.keys(req.body).length == 0) {
@@ -33,16 +33,6 @@ const createBooks = async function (req, res) {
             return res.status(400).send({ status: false, message: "excerpt length should be more than 4 characters" })
         }
 
-        if (!userId) {
-            return res.status(400).send({ status: false, message: "Please enter userId" })
-        }
-        if (userId.length !== 24) {
-            return res.status(400).send({ status: false, message: "Please enter proper length of user Id (24)" })
-        }
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).send({ status: false, message: "Please enter valid userId" })
-        }
-
         if (!ISBN) {
             return res.status(400).send({ status: false, message: "Please enter ISBN" })
         }
@@ -61,9 +51,12 @@ const createBooks = async function (req, res) {
         if (!releasedAt) {
             return res.status(400).send({ status: false, message: "Please enter releasing time" })
         }
+        if (!/^\d{4}\-(0?[1-9]|1[012])\-(0?[1-9]|[12][0-9]|3[01])$/.test(releasedAt)) {
+            return res.status(400).send({ status: false, message: "Please enter releasing time in right format" })
+        }
+        let formated_date = moment(releasedAt).format('YYYY-MM-DD');
+        req.body.releasedAt = formated_date
 
-        // var formated_date = moment(releasedAt).format('YYYY-MM-DD');
-        // console.log(formated_date)
 
         let titleName = cutSpace(title)
         req.body.title = titleName
@@ -72,10 +65,7 @@ const createBooks = async function (req, res) {
         req.body.excerpt = excerptBody
 
         let createdBooks = await booksModel.create(req.body)
-        // if(!formated_date){
-        //     await formated_date.save()
 
-        // }
         return res.status(201).send({ status: true, message: "Your book has been created successfully", data: createdBooks })
     } catch (err) {
         return res.status(500).send({ status: false, message: err.message })
@@ -88,22 +78,8 @@ const getBooks = async function (req, res) {
     try {
         let { userId, category, subcategory } = req.query
 
-        if (Object.keys(req.query).length == 0) {
-            return res.status(400).send({ status: false, message: "Please put query to get books" })
-        }
-
-        if (!userId) {
-            return res.status(400).send({ status: false, message: "Please enter userId" })
-        }
-        if (userId.length !== 24) {
-            return res.status(400).send({ status: false, message: "Please enter proper length of user Id (24)" })
-        }
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).send({ status: false, message: "Please enter valid userId" })
-        }
-
         let books = await booksModel.find(
-            { isDeleted: false },
+            { userId: req.decodedToken.userId }, { isDeleted: false },
             { $or: [{ userId: userId }, { category: category }, { subcategory: subcategory }] }
         )
             .sort({ userId: 1, category: 1, subcategory: 1 })
@@ -125,11 +101,7 @@ const getBooks = async function (req, res) {
 const getBooksById = async (req, res) => {
     try {
         const bookId = req.params.bookId
-        //    console.log('1')
-        //     if (!bookId) {
-        //         return res.status(400).send({ status: false, message: " bookid is missing" })
-        //     }
-        //     console.log('2')
+
         if (!mongoose.Types.ObjectId.isValid(bookId)) {
             return res.status(400).send({ status: false, message: "Please enter valid userId" })
         }
@@ -169,21 +141,12 @@ const updateBooksById = async function (req, res) {
             return res.status(400).send({ status: false, message: "Please enter the data in the request body" })
         }
 
-        if (!mongoose.Types.ObjectId.isValid(bookId)) {
-            return res.status(400).send({ status: false, message: "Please enter valid bookId" })
-        }
-
         if (excerpt.length < 6) {
             return res.status(400).send({ status: false, message: "excerpt length should be more than 6 characters" })
         }
 
         if (!/^[0-9]*[-| ][0-9]*[-| ][0-9]*[-| ][0-9]*[-| ][0-9]*$/.test(ISBN)) {
             return res.status(400).send({ status: false, message: "Please enter  valid ISBN" })
-        }
-
-        let bookPresent = await booksModel.findById(bookId)
-        if (!bookPresent) {
-            return res.status(404).send({ status: false, message: "There is no book with this Id" })
         }
 
         let uniqueCheck = await booksModel.findOne({ $or: [{ title: title }, { ISBN: ISBN }] })
@@ -218,18 +181,6 @@ const deleteBooksById = async function (req, res) {
     try {
         let bookId = req.params.bookId;
 
-        if (!mongoose.Types.ObjectId.isValid(bookId)) {
-            return res.status(400).send({ status: false, message: "Please enter valid bookId" })
-        }
-
-        let book = await booksModel.findById(bookId)
-        if (!book) {
-            return res.status(404).send({ status: false, message: 'no such book exists' });
-        }
-        if (book.isDeleted) {
-            return res.status(404).send({ status: false, message: "Book is already deleted" })
-        }
-
         let deleteBook = await booksModel.findOneAndUpdate(
             { _id: bookId, isDeleted: false },
             { $set: { isDeleted: true, deletedAt: new Date() } },
@@ -237,8 +188,8 @@ const deleteBooksById = async function (req, res) {
         )
 
         return res.status(200).send({ status: true, message: "deletion successful", data: deleteBook })
-    } catch (err) { 
-        return res.status(500).send({ status: false, message: err.message }) 
+    } catch (err) {
+        return res.status(500).send({ status: false, message: err.message })
     }
 }
 

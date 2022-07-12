@@ -8,11 +8,15 @@ const router = express.Router();
 
 router.post('/register', userController.createUser)
 router.post('/login', userController.loginUser)
+
+
 router.post('/books', middleware.authentication, middleware.authorization1, booksController.createBooks)
-router.get('/books', middleware.authentication, middleware.authorization2, booksController.getBooks)
-router.get('/books/:bookId', middleware.authentication, middleware.authorization3, booksController.getBooksById)
-router.put('/books/:bookId', middleware.authentication, middleware.authorization3, booksController.updateBooksById)
-router.delete('/books/:bookId', middleware.authentication, middleware.authorization3, booksController.deleteBooksById)
+router.get('/books', middleware.authentication, booksController.getBooks)
+router.get('/books/:bookId', middleware.authentication, booksController.getBooksById)
+router.put('/books/:bookId', middleware.authentication, middleware.authorization2, booksController.updateBooksById)
+router.delete('/books/:bookId', middleware.authentication, middleware.authorization2, booksController.deleteBooksById)
+
+
 router.post('/books/:bookId/review', reviewController.addreviewsById)
 router.put('/books/:bookId/review/:reviewId', reviewController.updateReview)
 router.delete('/books/:bookId/review/:reviewId', reviewController.deleteReview)

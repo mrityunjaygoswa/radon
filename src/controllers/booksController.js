@@ -78,14 +78,15 @@ const getBooks = async function (req, res) {
     try {
         let { userId, category, subcategory } = req.query
 
+        if (Object.keys(req.query).length == 0) {
+            return res.status(400).send({ status: false, msg: "please enter atleast a query" })
+        }
+
         let books = await booksModel.find(
-            { userId: req.decodedToken.userId }, { isDeleted: false },
-            { $or: [{ userId: userId }, { category: category }, { subcategory: subcategory }] }
-        )
-            .sort({ userId: 1, category: 1, subcategory: 1 })
-            .select({
-                _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1
-            })
+            { $or: [{ userId: userId }, { category: category }, { subcategory: subcategory }] },
+            { isDeleted: false },)
+            .select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, reviews: 1, releasedAt: 1})
+            .sort({title: 1})   
         if (!books[0]) {
             return res.status(404).send({ status: false, message: "no such books found" })
         }
@@ -100,13 +101,13 @@ const getBooks = async function (req, res) {
 
 const getBooksById = async (req, res) => {
     try {
-        const bookId = req.params.bookId
+        let bookId = req.params.bookId
 
         if (!mongoose.Types.ObjectId.isValid(bookId)) {
             return res.status(400).send({ status: false, message: "Please enter valid userId" })
         }
 
-        const data = await booksModel.findOne({ _id: bookId })
+        let data = await booksModel.findOne({ _id: bookId })
 
         if (!data) {
             return res.status(404).send({ status: false, message: "no books exist" })
@@ -119,7 +120,12 @@ const getBooksById = async (req, res) => {
 
         let { _id, title, excerpt, userId, category, subcategory, isDeleted, reviews, deletedAt, releasedAt, createdAt, updatedAt } = data
 
-        const reviewsData = await reviewModel.find({ isDeleted: false, bookId: _id }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
+        let reviewsData = await reviewModel.find({ isDeleted: false, bookId: _id }).select({ _id: 1, bookId: 1, reviewedBy: 1, reviewedAt: 1, rating: 1, review: 1 })
+        console.log(reviewsData)
+        if (reviewsData.length==0){
+            let msg = "for this book there is no review yet"
+            reviewsData = msg
+        }
 
         let list = { _id, title, excerpt, userId, category, subcategory, isDeleted, reviews, deletedAt, releasedAt, createdAt, updatedAt, reviewsData }
 

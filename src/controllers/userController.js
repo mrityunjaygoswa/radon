@@ -1,6 +1,5 @@
 const userModel = require('../models/userModel')
 const jwt = require('jsonwebtoken')
-const express = require('express')
 
 //---------------------------------------------------------cutSpaceFunction------------------------------------------------------------------//
 

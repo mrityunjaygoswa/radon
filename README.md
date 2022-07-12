@@ -1,7 +1,7 @@
 
 ## Project - Books Management
 
-prob-1 formating of date
+
 
 ### Key points
 - Create a group database `groupXDatabase`. You can clean the db you previously used and resue that.

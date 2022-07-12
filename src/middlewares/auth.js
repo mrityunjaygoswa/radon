@@ -58,49 +58,10 @@ const authorization1 = async function (req, res, next) {
     }
 }
 
+
 //---------------------------------------------------------authorization2-----------------------------------------------------------------------//
 
 const authorization2 = async function (req, res, next) {
-
-    try {
-        let validUserId = req.decodedToken.userId
-        let { userId, category, subcategory } = req.query
-
-        if (Object.keys(req.query).length == 0) {
-            return res.status(400).send({ status: false, msg: "please enter a query" })
-        }
-
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).send({ status: false, message: "Please enter valid userId" })
-        }
-
-        let savedData = await booksModel.find({ $or: [{ userId: userId }, { category: category }, { subcategory: subcategory }] })
-
-        if (!savedData[0]) {
-            return res.status(400).send({ status: false, msg: "no book exists with the given query" })
-        }
-        
-        let arr = []
-        for (let i = 0; i < savedData.length; i++) {
-            if (savedData[i].userId == validUserId) {
-                arr.push(savedData[i].userId)
-            }
-        }
-
-        if (arr[0] != validUserId) {
-            return res.status(403).send({ status: false, msg: "you are not authorized" })
-        } else {
-            next()
-        }
-    } catch (err) {
-        return res.status(500).send({ status: false, message: err.message })
-    }
-
-}
-
-//---------------------------------------------------------authorization3-----------------------------------------------------------------------//
-
-const authorization3 = async function (req, res, next) {
     try {
         let validUserId = req.decodedToken.userId
         let bookId = req.params.bookId
@@ -133,5 +94,4 @@ module.exports = {
     authentication,
     authorization1,
     authorization2,
-    authorization3,
 }

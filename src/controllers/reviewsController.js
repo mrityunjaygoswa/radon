@@ -7,7 +7,6 @@ const mongoose = require('mongoose');
 const addreviewsById = async function (req, res) {
     try {
         let { reviewedBy, rating, review } = req.body
-        console.log(reviewedBy)
         const bookId = req.params.bookId
 
         if (!mongoose.Types.ObjectId.isValid(bookId)) {

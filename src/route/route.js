@@ -3,8 +3,11 @@ const userController = require('../controllers/userController')
 const booksController = require('../controllers/booksController')
 const reviewController = require('../controllers/reviewsController')
 const middleware = require('../middlewares/auth')
-
+//const aws= require("aws-sdk")
 const router = express.Router();
+
+
+       
 
 router.post('/register', userController.createUser)
 router.post('/login', userController.loginUser)
@@ -21,4 +24,4 @@ router.post('/books/:bookId/review', reviewController.addreviewsById)
 router.put('/books/:bookId/review/:reviewId', reviewController.updateReview)
 router.delete('/books/:bookId/review/:reviewId', reviewController.deleteReview)
 
-module.exports = router;
+module.exports = router

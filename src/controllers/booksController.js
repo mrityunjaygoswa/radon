@@ -3,7 +3,7 @@ const booksModel = require('../models/booksModel');
 const reviewModel = require('../models/reviewModel');
 const mongoose = require('mongoose');
 const moment = require('moment');
-
+const awsControllers = require('../controllers/awsController')
 let { cutSpace } = userController
 
 //---------------------------------------------------------createBooks-----------------------------------------------------------------------//
@@ -12,7 +12,7 @@ const createBooks = async function (req, res) {
 
     try {
         let { title, excerpt, ISBN, category, subcategory, releasedAt } = req.body;
-
+        let files = req.files
 
         if (Object.keys(req.body).length == 0) {
             return res.status(400).send({ status: false, message: "Please request data to be created" })
@@ -60,6 +60,14 @@ const createBooks = async function (req, res) {
 
         let titleName = cutSpace(title)
         req.body.title = titleName
+
+       
+        if (files && files.length > 0) {
+            let uploadedFileURL = await awsControllers.uploadFile(files[0])
+            req.body["bookCover"]= uploadedFileURL
+            
+        }
+        
 
         let excerptBody = cutSpace(excerpt)
         req.body.excerpt = excerptBody

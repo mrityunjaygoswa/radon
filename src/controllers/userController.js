@@ -1,6 +1,7 @@
 const userModel = require('../models/userModel')
 const jwt = require('jsonwebtoken')
 
+
 //---------------------------------------------------------cutSpaceFunction------------------------------------------------------------------//
 
 const cutSpace = function (value) {
@@ -71,6 +72,7 @@ const createUser = async function (req, res) {
 
         let Name = cutSpace(name)
         req.body.name = Name
+
 
         let savedData = await userModel.create(req.body)
         return res.status(201).send({ status: true, message: " you are registered successfully", data: savedData })

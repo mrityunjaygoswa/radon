@@ -24,26 +24,39 @@ redisClient.on("connect", async function () {
 const SET_ASYNC = promisify(redisClient.SET).bind(redisClient);
 const GET_ASYNC = promisify(redisClient.GET).bind(redisClient);
 
+// Create Url
+
 const createUrl = async function (req, res) {
   try {
     const longUrl = req.body.longUrl
 
-    if (!longUrl ){
-        return res.status(400).send({status:false, message:"Body should be not empty."})
+    if(Object.keys(req.body).length == 0){
+      return res.status(400).send({status:false, message:"Body should not be Empty."})
     }
 
+    if (!longUrl || typeof longUrl != "string" || longUrl.trim().length == 0){
+        return res.status(400).send({status:false, message:"LongUrl must be present and Typeof must be String."})
+    }
+  
     if (!validUrl.isUri(longUrl)){
       return res.status(400).send({status:false, message:"URL incorect"})
     }
 
+    let data =await urlModel.findOne({longUrl}).select({_id:0,longUrl:1,shortUrl:1,urlCode:1})
+    if(data){
+      return res.status(201).send({status:true, message: "success",data:data})
+    }
+
     const str = 'http://localhost:3000/'
-    const urlCode = shortid.generate()
+    const urlCode = shortid.generate().toLowerCase()
 
     const shortUrl = str + urlCode
 
     const savedData = await urlModel.create({longUrl, shortUrl, urlCode})
 
-   let obj= {
+    await SET_ASYNC(`${longUrl, shortUrl, urlCode}`, JSON.stringify(savedData))
+
+   let obj = {
     longUrl: savedData.longUrl,
     shortUrl: savedData.shortUrl,
     urlCode: savedData.urlCode
@@ -59,6 +72,7 @@ const createUrl = async function (req, res) {
 
 module.exports.createUrl = createUrl
 
+// Get Url
 
 const getUrl = async function (req, res) {
     try {
@@ -66,7 +80,7 @@ const getUrl = async function (req, res) {
       const urlCode = req.params.urlCode
 
       if (!shortid.isValid(urlCode)){
-         return res.status(400).send({ status: false, message: "invalid URL" })
+         return res.status(400).send({ status: false, message: "invalid urlCode" })
         } 
        
       let cahcedProfileData = await GET_ASYNC(`${urlCode}`)
@@ -77,7 +91,7 @@ const getUrl = async function (req, res) {
 
       const getUrl  = await urlModel.findOne({ urlCode });
 
-      if (!getUrl) { return res.status(404).send({ status: false, message: "URL not found" })}
+      if (!getUrl) { return res.status(404).send({ status: false, message: "urlCode not found" })}
   
       await SET_ASYNC(`${urlCode}`, JSON.stringify(getUrl))
   
@@ -93,35 +107,4 @@ const getUrl = async function (req, res) {
 
   module.exports.getUrl = getUrl
 
-  // const fetchAuthorProfile = async function (req, res) {
-  //   let cahcedProfileData = await GET_ASYNC(`${req.params.authorId}`)
-  //   if(cahcedProfileData) {
-  //     res.send(cahcedProfileData)
-  //   } else {
-  //     let profile = await authorModel.findById(req.params.authorId);
-  //     await SET_ASYNC(`${req.params.authorId}`, JSON.stringify(profile))
-  //     res.send({ data: profile });
-  //   }
   
-  // };
-
-  // const urlCode = req.params.urlCode
-  //   if (!shortid.isValid(urlCode)) { return res.status(400).send({ status: false, message: "invalid URL" })} 
-     
-  //   let cahcedProfileData = await GET_ASYNC(`${urlCode}`)
-  //   if(cahcedProfileData) {
-  //      res.send(cahcedProfileData)
-  //    } else {
-
-  //   const getUrl  = await urlModel.findOne({ urlCode });
-  //   if (!getUrl) { return res.status(404).send({ status: false, message: "URL not found" })}
-
-  //   await SET_ASYNC(`${urlCode}`, JSON.stringify(getUrl))
-
-    
-     
-
-  //   return res.status(302).send({ status: true, message: "success", data: getUrl.longUrl })
-  
-  //   }
-

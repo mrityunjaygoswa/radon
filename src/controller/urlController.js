@@ -95,7 +95,7 @@ const getUrl = async function (req, res) {
   
       await SET_ASYNC(`${urlCode}`, JSON.stringify(getUrl))
   
-      return res.status(302).send({ status: true, message: "success", data: getUrl.longUrl })
+      return res.status(302).send("Rediect to" + getUrl.longUrl )
     
       }
     }

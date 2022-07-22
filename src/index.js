@@ -3,7 +3,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const route = require('./routes/route.js');
 const mongoose = require('mongoose');
-// const validUrl = require('shortid valid-url');
+
    
    
  
@@ -16,8 +16,8 @@ app.use(bodyParser.json());
 mongoose.connect("mongodb+srv://Aishwarya123:sg8eJZVpV9e3eEP3@cluster0.gf2pu4l.mongodb.net/group49Database", {
     useNewUrlParser: true
 })
-    .then(() => console.log("MongoDb is connected"))
-    .catch(err => console.log(err))
+.then(() => console.log("MongoDb is connected"))
+.catch(err => console.log(err))
      
         
 app.use('/', route)

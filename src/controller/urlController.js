@@ -44,7 +44,7 @@ const createUrl = async function (req, res) {
 
     let data =await urlModel.findOne({longUrl}).select({_id:0,longUrl:1,shortUrl:1,urlCode:1})
     if(data){
-      return res.status(201).send({status:true, message: "success",data:data})
+      return res.status(200).send({status:true, message: "urlCode is already generated for this URL.",data:data})
     }
 
     const str = 'http://localhost:3000/'
@@ -74,37 +74,29 @@ module.exports.createUrl = createUrl
 
 // Get Url
 
-const getUrl = async function (req, res) {
-    try {
-        
-      const urlCode = req.params.urlCode
-
-      if (!shortid.isValid(urlCode)){
-         return res.status(400).send({ status: false, message: "invalid urlCode" })
-        } 
-       
-      let cahcedProfileData = await GET_ASYNC(`${urlCode}`)
-
-      if(cahcedProfileData) {
-         res.send(cahcedProfileData)
-       } else {
-
-      const getUrl  = await urlModel.findOne({ urlCode });
-
-      if (!getUrl) { return res.status(404).send({ status: false, message: "urlCode not found" })}
-  
-      await SET_ASYNC(`${urlCode}`, JSON.stringify(getUrl))
-  
-      return res.status(302).send("Rediect to" + getUrl.longUrl )
-    
+const getUrlCode = async function (req, res) {
+  try {
+      
+      let urlCode= req.params.urlCode
+      let cachedUrl = await GET_ASYNC(urlCode)
+      if (cachedUrl) {
+        return res.status(302).redirect(cachedUrl)
+      } else {
+        const url = await urlModel.findOne({
+            urlCode: req.params.urlCode
+        })
+        if (!url) return res.status(404).send({ status: false, message: 'No URL Found' })
+        await SET_ASYNC(urlCode, url.longUrl)
+        return res.status(302).redirect(url.longUrl)
       }
-    }
-    catch (err) { 
-      return res.status(500).send({ status: false, message: err.message })
-    }
   }
-  
+  catch (err) {
+      console.error(err)
+      res.status(500).send({ status: false, message: err.message })
+  }
+}
 
-  module.exports.getUrl = getUrl
+
+  module.exports.getUrlCode = getUrlCode
 
   

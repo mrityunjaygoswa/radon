@@ -80,7 +80,7 @@ const getUrlCode = async function (req, res) {
       let urlCode= req.params.urlCode
       let cachedUrl = await GET_ASYNC(urlCode)
       if (cachedUrl) {
-        return res.status(302).redirect(cachedUrl)
+        return res.send(cachedUrl)
       } else {
         const url = await urlModel.findOne({
             urlCode: req.params.urlCode

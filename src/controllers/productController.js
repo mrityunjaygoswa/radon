@@ -156,7 +156,7 @@ const getQueryProduct = async(req, res) => {
 
             const titleCheck = await productModel.find({ isDeleted: false }).select({ title: 1, _id: 0 })
             if (!titleCheck) {
-                return res.status(404).send({ status: false, message: "Product not exsit with name " + name })
+                return res.status(404).send({ status: false, message: "Product not exist with name " + name })
             }
             final.title = { $regex: name }
         }

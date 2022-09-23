@@ -18,7 +18,7 @@ const createCart = async function(req, res) {
         if (Object.keys(req.body).length == 0) {
             return res.status(400).send({ status: false, message: "Please enter some DETAILS!!!" })
         }
-
+ 
         let final = {}
 
         final.userId = userId
@@ -147,7 +147,7 @@ const updateCart = async(req, res) => {
         }
 
 
-        let productCart = await cartModel.findOne({ _id: cartId, userId: userId }, { items: { $elemMatch: { productId: productId } } })
+        let productCart = await cartModel.findOne({ _id: cartId, userId: userId },{ items: { $elemMatch: { productId: productId } } })
         if (!productCart) {
             return res.status(400).send({ status: false, message: 'Product does not exists in the cart' })
         }

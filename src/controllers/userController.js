@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken')
 
 const createUser = async function(req, res) {
 
+   
+
     try {
         let final = {}
 

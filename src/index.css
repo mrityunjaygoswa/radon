@@ -1,13 +1,59 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+*{
+    background-color: rgb(184, 144, 184) ; 
+    height: auto;
+    /* #3b5998 */
+    /*#CCCCCC; */ 
 }
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+h1{
+    color: white;
+    background-color: #3b5998;
+    text-align: center;
+    border-radius: 5px;
+   
+}
+.centre-Div{
+    border: 3px solid white;
+    height: 500px;
+    width :300px;
+    margin-left: 35%;
+    margin-top: 5%;
+    background-color:#CCCCCC;  
+    border-radius: 15px;  
+    box-shadow: 10px 5px 5px  #3b5998
+}
+.input{
+   text-align: center;
+   height: 30px;
+   top: 10px;
+   border: none;
+   background: transparent;
+   font-size: 20px;
+   font-weight: 500;
+   width: 60%;
+   border-bottom: 2px solid  #3b5998;
+   outline: none;
+}
+.button{
+    padding: 9px 10px;
+    border: 2px solid #3b5998;
+    background-color: #3b5998;
+   border-radius: 50%;
+   font-size: 20px;
+   color: white;   
+}
+button:hover{
+    background-color: green;
+    border:green;
+}
+ol li{
+padding-left: 20px;
+ text-align: left;
+ font-size: 20px;
+ font-weight: 500;
+ min-height: 40px;
+display: flex;
+align-items: center;
+color: #3b5998;
+text-transform: capitalize;
+background-color: #CCCCCC;
 }
